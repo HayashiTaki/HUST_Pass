@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>华中大验证码助手</title><link rel="stylesheet" href="popup.css"></head>
+<body>
+  <main>
+    <h1>华中大验证码助手</h1>
+    <p class="intro">填好账号密码后，验证码与登录交给助手。</p>
+    <label class="toggle"><span>自动填写并登录</span><input id="enabled" type="checkbox" role="switch" aria-label="自动填写并登录"></label>
+    <section aria-labelledby="state-title">
+      <h2 id="state-title">当前状态</h2>
+      <p id="status" role="status" aria-live="polite">正在读取状态…</p>
+      <p id="attempts" class="muted"></p>
+    </section>
+    <button id="retry" type="button" disabled>重新尝试</button>
+    <p class="footnote">验证码在本机识别。助手不保存学号和密码。</p>
+  </main>
+  <script src="popup.js"></script>
+</body></html>

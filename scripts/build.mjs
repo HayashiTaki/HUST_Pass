@@ -12,12 +12,14 @@ for (const file of await readdir('node_modules/tesseract.js-core')) {
 }
 await mkdir('dist/vendor/lang', { recursive: true });
 await cp('node_modules/@tesseract.js-data/eng/4.0.0_best_int/eng.traineddata.gz', 'dist/vendor/lang/eng.traineddata.gz');
-const dependencies = ['tesseract.js','tesseract.js-core','gifuct-js','js-binary-schema-parser','@tesseract.js-data/eng'];
+const lock = JSON.parse(await readFile('package-lock.json', 'utf8'));
+const dependencies = Object.entries(lock.packages).filter(([path, pkg]) => path.startsWith('node_modules/') && !pkg.dev).map(([path]) => path.slice('node_modules/'.length));
 let notices = 'Third-party packages bundled in this extension\n\n';
 for (const name of dependencies) {
   const pkg = JSON.parse(await readFile(`node_modules/${name}/package.json`, 'utf8'));
-  notices += `${name} ${pkg.version} — ${pkg.license}\n`;
-  const files = await readdir(`node_modules/${name}`);
+  notices += `${pkg.name ?? name} ${pkg.version} — ${pkg.license}\n${pkg.homepage ?? ''}\n`;
+  const entries = await readdir(`node_modules/${name}`, { withFileTypes: true });
+  const files = entries.filter(e => e.isFile()).map(e => e.name);
   for (const file of files.filter(f => /^(licen[cs]e|copying|notice)/i.test(f))) {
     notices += await readFile(`node_modules/${name}/${file}`, 'utf8') + '\n';
   }

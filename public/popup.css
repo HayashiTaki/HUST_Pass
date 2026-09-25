@@ -1,0 +1,21 @@
+:root { color-scheme: light; font-family: "Segoe UI", "Microsoft YaHei", sans-serif; color: #242424; background: #faf9f6; font-size: 14px; line-height: 1.6; }
+* { box-sizing: border-box; }
+body { width: 340px; margin: 0; }
+main { padding: 24px; }
+h1 { font-size: 20px; line-height: 1.4; margin: 0 0 8px; font-weight: 650; }
+p { margin: 0; }
+.intro, .muted, .footnote { color: #595752; }
+.intro { margin-bottom: 24px; }
+.toggle { display: flex; align-items: center; justify-content: space-between; gap: 16px; cursor: pointer; padding: 14px 0; border-top: 1px solid #d9d5cf; border-bottom: 1px solid #d9d5cf; }
+input { width: 36px; height: 20px; margin: 0; accent-color: #9b2735; cursor: pointer; }
+section { padding: 22px 0; min-height: 130px; }
+h2 { font-size: 12px; font-weight: 600; color: #595752; margin: 0 0 8px; }
+#status { overflow-wrap: anywhere; }
+#attempts { font-size: 12px; margin-top: 6px; font-variant-numeric: tabular-nums; }
+button { width: 100%; min-height: 42px; border: 0; border-radius: 6px; background: #9b2735; color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+button:hover:not(:disabled) { background: #80202c; }
+button:active:not(:disabled) { background: #681924; }
+button:disabled { background: #e5e1db; color: #666059; cursor: default; }
+:focus-visible { outline: 2px solid #9b2735; outline-offset: 3px; }
+::selection { background: #eed0d4; color: #242424; }
+.footnote { font-size: 12px; margin-top: 18px; }
