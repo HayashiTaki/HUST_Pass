@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "华中大验证码助手",
+  "version": "0.1.0",
+  "description": "本地识别华中大统一身份认证动态验证码，并在浏览器填好账号密码后登录。",
+  "minimum_chrome_version": "116",
+  "permissions": ["storage", "offscreen"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_popup": "popup.html", "default_title": "华中大验证码助手" },
+  "content_scripts": [{
+    "matches": ["https://pass.hust.edu.cn/cas/login*"],
+    "js": ["content.js"], "run_at": "document_start", "all_frames": false
+  }],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; worker-src 'self'; connect-src 'self'"
+  }
+}
