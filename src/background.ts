@@ -1,3 +1,4 @@
+import { activateAutofill, cancelActivation, debuggerDetached } from './activation';
 import { MAX_ATTEMPTS, isLoginUrl, type AttemptState } from './protocol';
 
 interface Store { states: Record<string, AttemptState>; owner?: { tab: number; token: string; expires: number } }
@@ -38,7 +39,8 @@ async function handle(message: any, sender: chrome.runtime.MessageSender): Promi
     await chrome.storage.local.set({ enabled: message.enabled === true });
     if (!message.enabled) await exclusive(async () => {
       const store = await load();
-      for (const state of Object.values(store.states)) {
+      for (const [tab, state] of Object.entries(store.states)) {
+        cancelActivation(Number(tab));
         if (state.phase !== 'done') { state.phase = 'stopped'; state.message = '已暂停，可手动登录'; delete state.token; }
       }
       delete store.owner; await save(store);
@@ -54,13 +56,55 @@ async function handle(message: any, sender: chrome.runtime.MessageSender): Promi
     await exclusive(async () => {
       const store = await load();
       if (store.owner && store.owner.tab !== current.id && store.owner.expires > Date.now()) throw new Error('另一个登录页正在处理，请稍后重试');
-      delete store.owner; store.states[String(current.id)] = fresh(); await save(store);
+      delete store.owner;
+      const old = store.states[String(current.id)];
+      store.states[String(current.id)] = { ...fresh(), documentId: old?.documentId, activationDocumentId: old?.activationDocumentId };
+      cancelActivation(current.id!); await save(store);
     });
     await chrome.tabs.sendMessage(current.id, { type: 'page.retry' });
     return { ok: true };
   }
   if (!page || tab === undefined) throw new Error('消息来源无效');
   const key = String(tab), documentId = sender.documentId;
+
+  if (message.type === 'autofill.activate') {
+    if (!documentId) throw new Error('无法确认登录页面，请刷新后重试');
+    const token = await exclusive(async () => {
+      const store = await load(), state = store.states[key];
+      if (!await enabled() || !state || state.documentId !== documentId || state.phase !== 'waiting') throw new Error('自动填充任务已失效');
+      if (state.activationDocumentId === documentId) throw new Error('本页已尝试激活自动填充，请刷新页面后重试');
+      if (store.owner && store.owner.expires > Date.now()) throw new Error('另一个登录页正在处理，请稍后重试');
+      const token = crypto.randomUUID();
+      state.activationDocumentId = documentId; state.phase = 'activating'; state.token = token;
+      state.message = '正在确认浏览器自动填充'; state.updated = Date.now();
+      store.owner = { tab, token, expires: Date.now() + 7000 }; await save(store); return token;
+    });
+    const valid = () => exclusive(async () => {
+      const store = await load(), state = store.states[key];
+      return await enabled() && state?.documentId === documentId && state.phase === 'activating' && state.token === token
+        && store.owner?.tab === tab && store.owner.token === token && store.owner.expires > Date.now();
+    });
+    try {
+      await activateAutofill(tab, documentId, token, valid);
+      return await exclusive(async () => {
+        const store = await load(), state = store.states[key];
+        if (!await enabled() || state?.documentId !== documentId || state.phase !== 'activating' || state.token !== token) throw new Error('自动填充激活已取消');
+        state.phase = 'waiting'; state.message = '等待浏览器确认账号密码'; delete state.token;
+        if (store.owner?.token === token) delete store.owner;
+        await save(store); return { ok: true };
+      });
+    } catch (error) {
+      await exclusive(async () => {
+        const store = await load(), state = store.states[key];
+        if (state?.documentId === documentId && state.token === token) {
+          state.phase = 'stopped'; state.message = error instanceof Error ? error.message : '自动填充激活失败，请刷新页面'; delete state.token;
+          if (store.owner?.token === token) delete store.owner;
+          await save(store);
+        }
+      });
+      throw error;
+    }
+  }
 
   if (message.type === 'ocr') {
     const valid = await exclusive(async () => {
@@ -82,11 +126,12 @@ async function handle(message: any, sender: chrome.runtime.MessageSender): Promi
       // A new login document invalidates any in-flight code from another document/tab.
       if (store.owner && (store.owner.tab !== tab || state.documentId !== documentId)) {
         const old = store.states[String(store.owner.tab)];
-        if (old && old.phase === 'recognizing') { old.phase = 'stopped'; old.message = '另一个登录页已加载，请重新尝试'; delete old.token; }
+        if (old && (old.phase === 'recognizing' || old.phase === 'activating')) { old.phase = 'stopped'; old.message = '另一个登录页已加载，请重新尝试'; delete old.token; }
+        cancelActivation(store.owner.tab);
         delete store.owner;
       }
       if (state.phase === 'done' || (state.documentId !== documentId && state.count === 0)) state = store.states[key] = fresh();
-      if (state.phase === 'recognizing' && state.documentId !== documentId) {
+      if ((state.phase === 'recognizing' || state.phase === 'activating') && state.documentId !== documentId) {
         state.phase = 'stopped'; state.message = '页面已刷新，请重新尝试'; delete state.token;
       }
       if (message.error === 'other') { state.phase = 'stopped'; state.message = '网站提示登录异常，请检查页面提示后手动处理'; }
@@ -106,7 +151,7 @@ async function handle(message: any, sender: chrome.runtime.MessageSender): Promi
       if (state.phase !== 'waiting' || state.count >= MAX_ATTEMPTS) return { allowed: false, message: state.message };
       if (store.owner && store.owner.expires > Date.now()) return { allowed: false, busy: true, message: '另一个登录页正在处理' };
       const token = crypto.randomUUID();
-      state = { count: state.count + 1, phase: 'recognizing', message: `正在本地识别，第 ${state.count + 1}/3 次`, token, updated: Date.now(), documentId };
+      state = { count: state.count + 1, phase: 'recognizing', message: `正在本地识别，第 ${state.count + 1}/3 次`, token, updated: Date.now(), documentId, activationDocumentId: state.activationDocumentId };
       store.states[key] = state; store.owner = { tab, token, expires: Date.now() + 60_000 }; await save(store);
       return { allowed: true, token };
     }
@@ -126,6 +171,7 @@ async function handle(message: any, sender: chrome.runtime.MessageSender): Promi
     if (message.type === 'page.stop' && state.documentId === documentId) {
       // The old document's pagehide must not undo submitted state needed after a CAPTCHA rejection.
       if (message.leaving && (state.phase === 'submitted' || state.phase === 'done')) return { ok: true };
+      cancelActivation(tab);
       state.phase = 'stopped'; state.message = String(message.reason ?? '已停止，请手动登录').slice(0,100); delete state.token;
       if (store.owner?.tab === tab) delete store.owner;
       await save(store); return { ok: true };
@@ -140,9 +186,11 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
   return true;
 });
 chrome.tabs.onRemoved.addListener(tab => {
+  cancelActivation(tab);
   void exclusive(async () => { const store = await load(); delete store.states[String(tab)]; if (store.owner?.tab === tab) delete store.owner; await save(store); });
 });
 chrome.tabs.onUpdated.addListener((tab, change) => {
+  if (change.status === 'loading' || change.url) cancelActivation(tab);
   if (!change.url || isLoginUrl(change.url)) return;
   void exclusive(async () => {
     const store = await load(), state = store.states[String(tab)];
@@ -150,4 +198,8 @@ chrome.tabs.onUpdated.addListener((tab, change) => {
     if (store.owner?.tab === tab) delete store.owner;
     await save(store);
   });
+});
+
+chrome.debugger.onDetach.addListener(source => {
+  if (source.tabId !== undefined) debuggerDetached(source.tabId);
 });

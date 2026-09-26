@@ -17,7 +17,7 @@ async function refresh() {
     toggle.checked = result.enabled;
     status.textContent = operationError || (!result.supported ? '请在华中大统一身份认证的密码登录页使用。' : !result.enabled ? '已暂停，可手动登录。' : result.state.message);
     attempts.textContent = result.supported && result.state.count ? `本轮已尝试 ${result.state.count} / 3 次` : '';
-    retry.disabled = !result.enabled || !result.supported || ['recognizing','submitted'].includes(result.state?.phase);
+    retry.disabled = !result.enabled || !result.supported || ['activating','recognizing','submitted'].includes(result.state?.phase);
   } catch (error) { status.textContent = `无法读取扩展状态：${error instanceof Error ? error.message : '请重新加载扩展'}`; retry.disabled = true; }
 }
 async function act(message: object) {

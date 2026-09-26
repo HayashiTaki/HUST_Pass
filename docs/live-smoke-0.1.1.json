@@ -1,0 +1,66 @@
+{
+  "browser": "153.0.4234.48",
+  "mode": "Isolated profile, all POST requests blocked; no authenticated login",
+  "records": [
+    {
+      "path": "/cas/login",
+      "hasService": false,
+      "fields": [
+        {
+          "id": "un",
+          "exists": true
+        },
+        {
+          "id": "pd",
+          "exists": true
+        },
+        {
+          "id": "code",
+          "exists": true
+        },
+        {
+          "id": "codeImage",
+          "exists": true
+        },
+        {
+          "id": "index_login_btn",
+          "exists": true
+        }
+      ],
+      "credentialsPresent": false,
+      "captchaEmpty": true,
+      "imageWidth": 90,
+      "status": "等待浏览器填好学号和密码"
+    },
+    {
+      "path": "/cas/login",
+      "hasService": true,
+      "fields": [
+        {
+          "id": "un",
+          "exists": true
+        },
+        {
+          "id": "pd",
+          "exists": true
+        },
+        {
+          "id": "code",
+          "exists": true
+        },
+        {
+          "id": "codeImage",
+          "exists": true
+        },
+        {
+          "id": "index_login_btn",
+          "exists": true
+        }
+      ],
+      "credentialsPresent": false,
+      "captchaEmpty": true,
+      "imageWidth": 90,
+      "status": "等待浏览器填好学号和密码"
+    }
+  ]
+}

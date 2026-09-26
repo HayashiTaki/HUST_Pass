@@ -1,6 +1,6 @@
 {
   "name": "hust-pass-assistant",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,7 +9,8 @@
     "test": "node --import tsx --test tests/*.test.ts",
     "test:browser": "node scripts/browser-test.mjs",
     "evaluate": "node --import tsx scripts/evaluate.ts",
-    "package": "powershell -NoProfile -File scripts/package.ps1"
+    "package": "node scripts/package.mjs",
+    "test:autofill": "node scripts/autofill-browser-test.mjs"
   },
   "dependencies": {
     "@tesseract.js-data/eng": "1.0.0",
@@ -21,6 +22,7 @@
     "@types/node": "26.6.2",
     "@types/pngjs": "6.0.5",
     "esbuild": "0.28.2",
+    "fflate": "0.8.3",
     "playwright": "1.63.0",
     "pngjs": "7.0.0",
     "tsx": "4.23.15",

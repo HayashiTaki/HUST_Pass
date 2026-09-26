@@ -1,0 +1,854 @@
+{
+  "summary": {
+    "split": "dev",
+    "total": 40,
+    "correct": 39,
+    "rejected": 1,
+    "incorrect": 0,
+    "accuracy": 0.975,
+    "meanMs": 89
+  },
+  "rows": [
+    {
+      "id": "000",
+      "expected": "0800",
+      "code": "0800",
+      "confidence": 94,
+      "candidates": [
+        {
+          "text": "0800",
+          "confidence": 94
+        },
+        {
+          "text": "0800",
+          "confidence": 94
+        },
+        {
+          "text": "0390",
+          "confidence": 0
+        }
+      ],
+      "ms": 177
+    },
+    {
+      "id": "001",
+      "expected": "2254",
+      "code": "2254",
+      "confidence": 95,
+      "candidates": [
+        {
+          "text": "2254",
+          "confidence": 95
+        },
+        {
+          "text": "2254",
+          "confidence": 95
+        },
+        {
+          "text": "2254",
+          "confidence": 55
+        }
+      ],
+      "ms": 95
+    },
+    {
+      "id": "002",
+      "expected": "3824",
+      "code": "3824",
+      "confidence": 95,
+      "candidates": [
+        {
+          "text": "3824",
+          "confidence": 95
+        },
+        {
+          "text": "3824",
+          "confidence": 95
+        },
+        {
+          "text": "3824",
+          "confidence": 85
+        }
+      ],
+      "ms": 88
+    },
+    {
+      "id": "003",
+      "expected": "0063",
+      "code": "0063",
+      "confidence": 96,
+      "candidates": [
+        {
+          "text": "0063",
+          "confidence": 94
+        },
+        {
+          "text": "0063",
+          "confidence": 94
+        },
+        {
+          "text": "0063",
+          "confidence": 96
+        }
+      ],
+      "ms": 88
+    },
+    {
+      "id": "004",
+      "expected": "0120",
+      "code": "0120",
+      "confidence": 95,
+      "candidates": [
+        {
+          "text": "0120",
+          "confidence": 95
+        },
+        {
+          "text": "0120",
+          "confidence": 95
+        },
+        {
+          "text": "0120",
+          "confidence": 43
+        }
+      ],
+      "ms": 85
+    },
+    {
+      "id": "005",
+      "expected": "3101",
+      "code": "3101",
+      "confidence": 95,
+      "candidates": [
+        {
+          "text": "3101",
+          "confidence": 95
+        },
+        {
+          "text": "3101",
+          "confidence": 95
+        },
+        {
+          "text": "301",
+          "confidence": 0
+        }
+      ],
+      "ms": 91
+    },
+    {
+      "id": "006",
+      "expected": "2606",
+      "code": "2606",
+      "confidence": 96,
+      "candidates": [
+        {
+          "text": "2606",
+          "confidence": 96
+        },
+        {
+          "text": "2606",
+          "confidence": 96
+        },
+        {
+          "text": "",
+          "confidence": 0
+        }
+      ],
+      "ms": 87
+    },
+    {
+      "id": "007",
+      "expected": "2596",
+      "code": "2596",
+      "confidence": 96,
+      "candidates": [
+        {
+          "text": "2596",
+          "confidence": 96
+        },
+        {
+          "text": "2596",
+          "confidence": 96
+        },
+        {
+          "text": "2596",
+          "confidence": 30
+        }
+      ],
+      "ms": 91
+    },
+    {
+      "id": "008",
+      "expected": "2949",
+      "code": "2949",
+      "confidence": 96,
+      "candidates": [
+        {
+          "text": "2949",
+          "confidence": 96
+        },
+        {
+          "text": "2949",
+          "confidence": 96
+        },
+        {
+          "text": "5949",
+          "confidence": 75
+        }
+      ],
+      "ms": 86
+    },
+    {
+      "id": "009",
+      "expected": "4387",
+      "code": "4387",
+      "confidence": 94,
+      "candidates": [
+        {
+          "text": "4387",
+          "confidence": 94
+        },
+        {
+          "text": "4387",
+          "confidence": 94
+        },
+        {
+          "text": "1387",
+          "confidence": 62
+        }
+      ],
+      "ms": 93
+    },
+    {
+      "id": "010",
+      "expected": "5637",
+      "code": "5637",
+      "confidence": 96,
+      "candidates": [
+        {
+          "text": "5637",
+          "confidence": 76
+        },
+        {
+          "text": "5637",
+          "confidence": 74
+        },
+        {
+          "text": "5637",
+          "confidence": 96
+        }
+      ],
+      "ms": 98
+    },
+    {
+      "id": "011",
+      "expected": "6978",
+      "code": "6978",
+      "confidence": 71,
+      "candidates": [
+        {
+          "text": "6978",
+          "confidence": 0
+        },
+        {
+          "text": "6978",
+          "confidence": 0
+        },
+        {
+          "text": "6978",
+          "confidence": 71
+        }
+      ],
+      "ms": 85
+    },
+    {
+      "id": "012",
+      "expected": "7144",
+      "code": "7144",
+      "confidence": 86,
+      "candidates": [
+        {
+          "text": "7144",
+          "confidence": 86
+        },
+        {
+          "text": "7144",
+          "confidence": 86
+        },
+        {
+          "text": "7144",
+          "confidence": 76
+        }
+      ],
+      "ms": 84
+    },
+    {
+      "id": "013",
+      "expected": "0951",
+      "code": "0951",
+      "confidence": 94,
+      "candidates": [
+        {
+          "text": "0951",
+          "confidence": 93
+        },
+        {
+          "text": "0951",
+          "confidence": 94
+        },
+        {
+          "text": "0954",
+          "confidence": 87
+        }
+      ],
+      "ms": 86
+    },
+    {
+      "id": "014",
+      "expected": "5662",
+      "code": "5662",
+      "confidence": 90,
+      "candidates": [
+        {
+          "text": "5662",
+          "confidence": 90
+        },
+        {
+          "text": "5662",
+          "confidence": 90
+        },
+        {
+          "text": "5662",
+          "confidence": 27
+        }
+      ],
+      "ms": 85
+    },
+    {
+      "id": "015",
+      "expected": "0309",
+      "code": "0309",
+      "confidence": 95,
+      "candidates": [
+        {
+          "text": "0309",
+          "confidence": 95
+        },
+        {
+          "text": "0309",
+          "confidence": 95
+        },
+        {
+          "text": "30 9",
+          "confidence": 54
+        }
+      ],
+      "ms": 86
+    },
+    {
+      "id": "016",
+      "expected": "1386",
+      "code": "1386",
+      "confidence": 95,
+      "candidates": [
+        {
+          "text": "1386",
+          "confidence": 95
+        },
+        {
+          "text": "1386",
+          "confidence": 95
+        },
+        {
+          "text": "1 386",
+          "confidence": 94
+        }
+      ],
+      "ms": 82
+    },
+    {
+      "id": "017",
+      "expected": "5367",
+      "code": "5367",
+      "confidence": 68,
+      "candidates": [
+        {
+          "text": "5367",
+          "confidence": 68
+        },
+        {
+          "text": "5367",
+          "confidence": 68
+        },
+        {
+          "text": "5867",
+          "confidence": 0
+        }
+      ],
+      "ms": 92
+    },
+    {
+      "id": "018",
+      "expected": "5499",
+      "code": "5499",
+      "confidence": 96,
+      "candidates": [
+        {
+          "text": "5499",
+          "confidence": 96
+        },
+        {
+          "text": "5499",
+          "confidence": 96
+        },
+        {
+          "text": "5499",
+          "confidence": 91
+        }
+      ],
+      "ms": 86
+    },
+    {
+      "id": "019",
+      "expected": "9705",
+      "code": "9705",
+      "confidence": 91,
+      "candidates": [
+        {
+          "text": "9705",
+          "confidence": 91
+        },
+        {
+          "text": "9705",
+          "confidence": 91
+        },
+        {
+          "text": "9705",
+          "confidence": 73
+        }
+      ],
+      "ms": 85
+    },
+    {
+      "id": "020",
+      "expected": "9967",
+      "code": "9967",
+      "confidence": 87,
+      "candidates": [
+        {
+          "text": "9967",
+          "confidence": 58
+        },
+        {
+          "text": "9967",
+          "confidence": 58
+        },
+        {
+          "text": "9967",
+          "confidence": 87
+        }
+      ],
+      "ms": 84
+    },
+    {
+      "id": "021",
+      "expected": "2937",
+      "code": "2937",
+      "confidence": 95,
+      "candidates": [
+        {
+          "text": "2937",
+          "confidence": 95
+        },
+        {
+          "text": "2937",
+          "confidence": 95
+        },
+        {
+          "text": "2037",
+          "confidence": 49
+        }
+      ],
+      "ms": 83
+    },
+    {
+      "id": "022",
+      "expected": "7879",
+      "code": "7879",
+      "confidence": 81,
+      "candidates": [
+        {
+          "text": "7879",
+          "confidence": 81
+        },
+        {
+          "text": "7879",
+          "confidence": 81
+        },
+        {
+          "text": "7829",
+          "confidence": 89
+        }
+      ],
+      "ms": 82
+    },
+    {
+      "id": "023",
+      "expected": "7714",
+      "code": "7714",
+      "confidence": 65,
+      "candidates": [
+        {
+          "text": "7714",
+          "confidence": 65
+        },
+        {
+          "text": "7714",
+          "confidence": 65
+        },
+        {
+          "text": "7514",
+          "confidence": 81
+        }
+      ],
+      "ms": 83
+    },
+    {
+      "id": "024",
+      "expected": "4219",
+      "code": "4219",
+      "confidence": 95,
+      "candidates": [
+        {
+          "text": "4219",
+          "confidence": 95
+        },
+        {
+          "text": "4219",
+          "confidence": 95
+        },
+        {
+          "text": "4219",
+          "confidence": 0
+        }
+      ],
+      "ms": 87
+    },
+    {
+      "id": "025",
+      "expected": "8681",
+      "code": "8681",
+      "confidence": 96,
+      "candidates": [
+        {
+          "text": "8681",
+          "confidence": 96
+        },
+        {
+          "text": "8681",
+          "confidence": 96
+        },
+        {
+          "text": "8681",
+          "confidence": 46
+        }
+      ],
+      "ms": 81
+    },
+    {
+      "id": "026",
+      "expected": "7256",
+      "code": "7256",
+      "confidence": 90,
+      "candidates": [
+        {
+          "text": "7256",
+          "confidence": 90
+        },
+        {
+          "text": "7256",
+          "confidence": 90
+        },
+        {
+          "text": "7256",
+          "confidence": 90
+        }
+      ],
+      "ms": 84
+    },
+    {
+      "id": "027",
+      "expected": "6904",
+      "code": "6904",
+      "confidence": 96,
+      "candidates": [
+        {
+          "text": "6904",
+          "confidence": 96
+        },
+        {
+          "text": "6904",
+          "confidence": 96
+        },
+        {
+          "text": "6 904",
+          "confidence": 93
+        }
+      ],
+      "ms": 85
+    },
+    {
+      "id": "028",
+      "expected": "4057",
+      "code": "4057",
+      "confidence": 90,
+      "candidates": [
+        {
+          "text": "4057",
+          "confidence": 90
+        },
+        {
+          "text": "4057",
+          "confidence": 90
+        },
+        {
+          "text": "4059",
+          "confidence": 27
+        }
+      ],
+      "ms": 90
+    },
+    {
+      "id": "029",
+      "expected": "9402",
+      "code": "9402",
+      "confidence": 86,
+      "candidates": [
+        {
+          "text": "9402",
+          "confidence": 86
+        },
+        {
+          "text": "9402",
+          "confidence": 86
+        },
+        {
+          "text": "94672",
+          "confidence": 53
+        }
+      ],
+      "ms": 92
+    },
+    {
+      "id": "030",
+      "expected": "7364",
+      "code": "7364",
+      "confidence": 71,
+      "candidates": [
+        {
+          "text": "7364",
+          "confidence": 71
+        },
+        {
+          "text": "7364",
+          "confidence": 71
+        },
+        {
+          "text": "7364",
+          "confidence": 0
+        }
+      ],
+      "ms": 86
+    },
+    {
+      "id": "031",
+      "expected": "7690",
+      "code": "7690",
+      "confidence": 94,
+      "candidates": [
+        {
+          "text": "7690",
+          "confidence": 90
+        },
+        {
+          "text": "7690",
+          "confidence": 90
+        },
+        {
+          "text": "7690",
+          "confidence": 94
+        }
+      ],
+      "ms": 92
+    },
+    {
+      "id": "032",
+      "expected": "8814",
+      "code": "8814",
+      "confidence": 95,
+      "candidates": [
+        {
+          "text": "8814",
+          "confidence": 95
+        },
+        {
+          "text": "8814",
+          "confidence": 95
+        },
+        {
+          "text": "88 14",
+          "confidence": 64
+        }
+      ],
+      "ms": 81
+    },
+    {
+      "id": "033",
+      "expected": "6310",
+      "code": "6310",
+      "confidence": 96,
+      "candidates": [
+        {
+          "text": "6310",
+          "confidence": 96
+        },
+        {
+          "text": "6310",
+          "confidence": 96
+        },
+        {
+          "text": "6310",
+          "confidence": 43
+        }
+      ],
+      "ms": 87
+    },
+    {
+      "id": "034",
+      "expected": "3171",
+      "code": "3171",
+      "confidence": 77,
+      "candidates": [
+        {
+          "text": "3171",
+          "confidence": 77
+        },
+        {
+          "text": "3171",
+          "confidence": 77
+        },
+        {
+          "text": "3 178",
+          "confidence": 68
+        }
+      ],
+      "ms": 84
+    },
+    {
+      "id": "035",
+      "expected": "4582",
+      "code": "4582",
+      "confidence": 95,
+      "candidates": [
+        {
+          "text": "4582",
+          "confidence": 95
+        },
+        {
+          "text": "4582",
+          "confidence": 95
+        },
+        {
+          "text": "4582",
+          "confidence": 91
+        }
+      ],
+      "ms": 82
+    },
+    {
+      "id": "036",
+      "expected": "7373",
+      "code": null,
+      "confidence": 0,
+      "reason": "识别结果不够确定",
+      "candidates": [
+        {
+          "text": "77373",
+          "confidence": 0
+        },
+        {
+          "text": "77373",
+          "confidence": 0
+        },
+        {
+          "text": "7373",
+          "confidence": 96
+        }
+      ],
+      "ms": 80
+    },
+    {
+      "id": "037",
+      "expected": "8187",
+      "code": "8187",
+      "confidence": 73,
+      "candidates": [
+        {
+          "text": "8187",
+          "confidence": 73
+        },
+        {
+          "text": "8187",
+          "confidence": 73
+        },
+        {
+          "text": "81874",
+          "confidence": 80
+        }
+      ],
+      "ms": 81
+    },
+    {
+      "id": "038",
+      "expected": "2008",
+      "code": "2008",
+      "confidence": 96,
+      "candidates": [
+        {
+          "text": "2008",
+          "confidence": 96
+        },
+        {
+          "text": "2008",
+          "confidence": 96
+        },
+        {
+          "text": "2008",
+          "confidence": 92
+        }
+      ],
+      "ms": 87
+    },
+    {
+      "id": "039",
+      "expected": "0236",
+      "code": "0236",
+      "confidence": 95,
+      "candidates": [
+        {
+          "text": "0236",
+          "confidence": 95
+        },
+        {
+          "text": "0236",
+          "confidence": 95
+        },
+        {
+          "text": "0236",
+          "confidence": 51
+        }
+      ],
+      "ms": 84
+    }
+  ]
+}

@@ -1,6 +1,6 @@
-export type Phase = 'waiting' | 'recognizing' | 'submitted' | 'stopped' | 'done';
+export type Phase = 'waiting' | 'activating' | 'recognizing' | 'submitted' | 'stopped' | 'done';
 export interface AttemptState {
-  count: number; phase: Phase; message: string; updated: number; token?: string; documentId?: string;
+  count: number; phase: Phase; message: string; updated: number; token?: string; documentId?: string; activationDocumentId?: string;
 }
 export const MAX_ATTEMPTS = 3;
 export const isLoginUrl = (url: string) => {

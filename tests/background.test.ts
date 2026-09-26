@@ -15,7 +15,8 @@ async function harness() {
     runtime: { id: 'test-extension', getURL: (s: string) => `chrome-extension://test-extension/${s}`,
       onMessage: { addListener: (fn: any) => { listener = fn; } } },
     storage: { session: area(session), local: area(local) },
-    tabs: { onRemoved: { addListener() {} }, onUpdated: { addListener() {} } },
+    debugger: { onDetach: { addListener() {} }, attach: async () => {}, detach: async () => {}, sendCommand: async () => {} },
+    tabs: { query: async () => [{id:1}], sendMessage: async () => ({valid:true,url:'https://pass.hust.edu.cn/cas/login',x:10,y:10,width:100,height:100,supported:true}), onRemoved: { addListener() {} }, onUpdated: { addListener() {} } },
   };
   vm.runInNewContext(await readFile('dist/background.js','utf8'), { chrome, crypto: webcrypto, URL, Date, setTimeout, clearTimeout, console });
   const sender = (tab = 1, doc = 'first') => ({ id: 'test-extension', tab: {id: tab}, frameId: 0, url: 'https://pass.hust.edu.cn/cas/login', documentId: doc });
@@ -116,4 +117,24 @@ test('late pagehide cannot turn a completed navigation into a stopped attempt', 
   await h.send({type:'page.stop',leaving:true});
   const initialized=await h.send({type:'page.init'},1,'next-login');
   assert.equal(initialized.state.phase,'waiting');assert.equal(initialized.state.count,0);
+});
+
+
+test('autofill activation is once per document, costs no CAPTCHA attempt and survives explicit retry', async () => {
+  const h=await harness();await h.send({type:'page.init'});
+  assert.equal((await h.send({type:'autofill.activate'})).ok,true);
+  assert.equal(h.session.runtimeState.states['1'].count,0);
+  assert.equal(h.session.runtimeState.states['1'].phase,'waiting');
+  const reply:any=await new Promise(resolve=>h.listener({type:'ui.retry'},{id:'test-extension',url:'chrome-extension://test-extension/popup.html'},resolve));
+  assert.equal(reply.ok,true);
+  assert.match((await h.send({type:'autofill.activate'})).error,/已尝试/);
+  assert.equal((await h.send({type:'attempt.begin'})).allowed,true);
+  assert.equal(h.session.runtimeState.states['1'].count,1);
+});
+
+test('activation from a stale document is rejected before reserving a task', async () => {
+  const h=await harness();await h.send({type:'page.init'});
+  assert.match((await h.send({type:'autofill.activate'},1,'wrong-document')).error,/失效/);
+  assert.equal(h.session.runtimeState.states['1'].activationDocumentId,undefined);
+  assert.equal(h.session.runtimeState.states['1'].count,0);
 });
