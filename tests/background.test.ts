@@ -138,3 +138,30 @@ test('activation from a stale document is rejected before reserving a task', asy
   assert.equal(h.session.runtimeState.states['1'].activationDocumentId,undefined);
   assert.equal(h.session.runtimeState.states['1'].count,0);
 });
+
+
+test('deferring a credential edit releases only the reserved attempt and preserves previous failures', async () => {
+  const h=await harness();await h.send({type:'page.init'});
+  const failed=await h.send({type:'attempt.begin'});await h.send({type:'attempt.reject',token:failed.token});
+  const edited=await h.send({type:'attempt.begin'});
+  assert.equal(h.session.runtimeState.states['1'].count,2);
+  assert.equal((await h.send({type:'attempt.defer',token:edited.token})).ok,true);
+  assert.equal(h.session.runtimeState.states['1'].count,1);
+  assert.equal(h.session.runtimeState.states['1'].phase,'waiting');
+  assert.equal(h.session.runtimeState.owner,undefined);
+  assert.equal((await h.send({type:'attempt.defer',token:edited.token})).ok,false);
+  const resumed=await h.send({type:'attempt.begin'});
+  assert.equal(h.session.runtimeState.states['1'].count,2);
+  assert.equal((await h.send({type:'attempt.submit',token:resumed.token})).valid,true);
+  assert.equal((await h.send({type:'attempt.defer',token:resumed.token})).ok,true);
+  assert.equal(h.session.runtimeState.states['1'].count,1);
+});
+
+test('stale tokens and documents cannot defer a current task or reset its failure budget', async () => {
+  const h=await harness();await h.send({type:'page.init'});
+  const start=await h.send({type:'attempt.begin'});
+  assert.equal((await h.send({type:'attempt.defer',token:'stale'})).ok,false);
+  assert.equal((await h.send({type:'attempt.defer',token:start.token},1,'other-document')).ok,false);
+  assert.equal(h.session.runtimeState.states['1'].count,1);
+  assert.equal(h.session.runtimeState.owner.token,start.token);
+});

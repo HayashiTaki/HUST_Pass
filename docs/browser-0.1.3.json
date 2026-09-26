@@ -1,0 +1,140 @@
+{
+  "browser": "153.0.4234.48",
+  "results": [
+    {
+      "name": "Delayed browser autofill, leading zero, wrong MIME, offline OCR, original click and query preservation",
+      "passed": true
+    },
+    {
+      "name": "CAPTCHA rejection across reloads stops after exactly three attempts despite page storage clearing",
+      "passed": true
+    },
+    {
+      "name": "Credential error never auto submits",
+      "passed": true
+    },
+    {
+      "name": "Manual input cancels delayed image and stale OCR",
+      "passed": true
+    },
+    {
+      "name": "Manual image refresh invalidates pending task",
+      "passed": true
+    },
+    {
+      "name": "Low-confidence OCR retries twice then stops without filling",
+      "passed": true
+    },
+    {
+      "name": "Hidden password panel does not run",
+      "passed": true
+    },
+    {
+      "name": "Repeated identical inline CAPTCHA errors observe the three-attempt budget",
+      "passed": true
+    },
+    {
+      "name": "Network failure stops instead of retrying login",
+      "passed": true
+    },
+    {
+      "name": "Additional authentication remains manual",
+      "passed": true
+    },
+    {
+      "name": "Popup toggle and explicit retry work without storing credentials",
+      "passed": true
+    },
+    {
+      "name": "Another login tab invalidates an in-flight CAPTCHA",
+      "passed": true
+    },
+    {
+      "name": "Popup action errors remain readable across periodic status refreshes",
+      "passed": true
+    },
+    {
+      "name": "Clearing and editing credentials during a pending fetch resumes automatically without spending a failed attempt",
+      "passed": true
+    },
+    {
+      "name": "Credential editing while OCR is running resumes automatically and discards the old result",
+      "passed": true
+    },
+    {
+      "name": "Explicit manual click submission is never submitted again by the extension",
+      "passed": true
+    },
+    {
+      "name": "Explicit manual enter submission is never submitted again by the extension",
+      "passed": true
+    }
+  ],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+  ],
+  "requests": [
+    "/cas/login",
+    "/cas/code",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/code",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/code",
+    "/cas/code",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/code",
+    "/cas/code",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/code",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/code",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/code",
+    "/cas/login",
+    "/cas/code",
+    "/cas/code"
+  ],
+  "extensionVersion": "0.1.3"
+}

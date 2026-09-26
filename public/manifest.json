@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "华中大验证码助手",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "本地识别华中大统一身份认证动态验证码，并在浏览器填好账号密码后登录。",
   "minimum_chrome_version": "116",
   "permissions": [

@@ -1,0 +1,63 @@
+{
+  "browser": "153.0.4234.48",
+  "fixture": "CSS.forcePseudoState sets native autofill state with empty DOM values; dummy credentials appear only after a trusted mousedown. This is not a real password-manager account test.",
+  "results": [
+    {
+      "name": "Truly empty fields neither attach nor submit",
+      "passed": true
+    },
+    {
+      "name": "Native autofill pseudo-state with empty DOM values is materialized by one trusted browser click, then OCR and login run",
+      "passed": true
+    },
+    {
+      "name": "Already materialized fields bypass debugger activation",
+      "passed": true
+    },
+    {
+      "name": "Debugger attach failure gives a specific error without submitting or retrying",
+      "passed": true
+    },
+    {
+      "name": "Materialization timeout stops; explicit retry cannot repeat activation in the same document or spend a CAPTCHA attempt",
+      "passed": true
+    },
+    {
+      "name": "Editing a username during activation does not stop automatic login",
+      "passed": true
+    },
+    {
+      "name": "Tab switching cancels pending activation",
+      "passed": true
+    },
+    {
+      "name": "Pointer capture retargets final click to body; autofill, CAPTCHA and login still complete",
+      "passed": true
+    },
+    {
+      "name": "Pointer capture retargets final click to #loginPanel; autofill, CAPTCHA and login still complete",
+      "passed": true
+    },
+    {
+      "name": "Delayed release within the registered window completes once",
+      "passed": true
+    },
+    {
+      "name": "Repeated physical clicks during activation do not cancel login",
+      "passed": true
+    },
+    {
+      "name": "Ordinary clicks and key presses during activation do not cancel login",
+      "passed": true
+    },
+    {
+      "name": "Navigation cancels the old document and sends no late click to its replacement",
+      "passed": true
+    },
+    {
+      "name": "Explicit manual CAPTCHA input during activation is still preserved",
+      "passed": true
+    }
+  ],
+  "extensionVersion": "0.1.3"
+}

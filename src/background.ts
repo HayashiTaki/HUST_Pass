@@ -162,6 +162,14 @@ async function handle(message: any, sender: chrome.runtime.MessageSender): Promi
       // Keep session-wide ownership during the POST/redirect, so another tab cannot refresh its code.
       store.owner.expires = Date.now() + 25_000; await save(store); return { valid: true };
     }
+    if (message.type === 'attempt.defer') {
+      // Undo only the reserved, not-yet-clicked attempt. Previous failures remain.
+      if (state.documentId !== documentId || state.token !== message.token || !['recognizing','submitted'].includes(state.phase)
+        || store.owner?.tab !== tab || store.owner.token !== message.token) return { ok: false };
+      state.count = Math.max(0, state.count - 1); state.phase = 'waiting'; state.message = '等待账号密码稳定后继续';
+      state.updated = Date.now(); delete state.token; delete store.owner;
+      await save(store); return { ok: true };
+    }
     if (message.type === 'attempt.reject' && state.token === message.token && state.phase === 'recognizing') {
       delete store.owner; delete state.token;
       state.phase = state.count < MAX_ATTEMPTS ? 'waiting' : 'stopped';

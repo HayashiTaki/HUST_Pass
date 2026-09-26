@@ -22,7 +22,7 @@ try {
   const html = () => `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"></head><body>
   <main class="panel-right"><h1>密码登录（自动化测试）</h1><input id="un" placeholder="学号"><input id="pd" type="password" placeholder="密码"><input id="code" placeholder="验证码">
   <a class="code-box"><img id="codeImage" src="/cas/code"></a><button id="index_login_btn">登录</button><div id="errormsg"></div><div id="errormsghide" hidden>${postError}</div></main>
-  <script>localStorage.clear();sessionStorage.clear();window.clicks=0;document.querySelector('#index_login_btn').onclick=()=>{window.clicks++;};document.querySelector('#codeImage').onclick=()=>{document.querySelector('#codeImage').src='/cas/code?manual='+Date.now()};</script></body></html>`;
+  <script>localStorage.clear();sessionStorage.clear();window.clicks=0;for(const id of ['un','pd','code'])document.getElementById(id).addEventListener('keyup',e=>{if(e.key==='Enter')document.getElementById('index_login_btn').click();});document.querySelector('#index_login_btn').onclick=()=>{window.clicks++;};document.querySelector('#codeImage').onclick=()=>{document.querySelector('#codeImage').src='/cas/code?manual='+Date.now()};</script></body></html>`;
   await context.route('https://pass.hust.edu.cn/**', async route => {
     const url = new URL(route.request().url()); requests.push(url.pathname);
     if (url.pathname === '/cas/login') return route.fulfill({ contentType: 'text/html', body: html() });
@@ -128,6 +128,43 @@ try {
   assert.match(await conflictPopup.locator('#status').innerText(),/另一个登录页正在处理/);
   await conflictPopup.screenshot({path:'test-results/popup-error.png'});await conflictPopup.close();
   check('Popup action errors remain readable across periodic status refreshes');
+
+  await reset(); await open(); codeDelay=2000; await fill();
+  await page.waitForFunction(()=>document.querySelector('#hust-pass-status').textContent.includes('本地识别'));
+  await page.locator('#un').fill('');
+  await page.waitForFunction(()=>document.querySelector('#hust-pass-status').textContent.includes('等待账号密码稳定'));
+  assert.equal(await page.evaluate(()=>window.clicks),0);
+  assert.equal(Object.values((await worker.evaluate(()=>chrome.storage.session.get('runtimeState'))).runtimeState.states)[0].count,0);
+  await page.locator('#un').fill('changed-user');await clicked();
+  assert.equal(await page.inputValue('#un'),'changed-user');
+  assert.equal(Object.values((await worker.evaluate(()=>chrome.storage.session.get('runtimeState'))).runtimeState.states)[0].count,1);
+  check('Clearing and editing credentials during a pending fetch resumes automatically without spending a failed attempt');
+
+  codeDelay=0; await reset();await open();
+  await worker.evaluate(()=>{
+    const original=chrome.runtime.sendMessage.bind(chrome.runtime);
+    chrome.runtime.sendMessage=async(message,...rest)=>{
+      const reply=await original(message,...rest);
+      if(message?.target==='offscreen')await new Promise(r=>setTimeout(r,1500));
+      return reply;
+    };
+  });
+  await fill();await page.waitForFunction(()=>document.querySelector('#codeImage').src.startsWith('blob:'));
+  await page.locator('#pd').fill('');await page.waitForTimeout(1800);
+  assert.equal(await page.evaluate(()=>window.clicks),0);
+  await page.locator('#pd').fill('changed-password');await clicked();
+  assert.equal(await page.inputValue('#pd'),'changed-password');
+  assert.equal(Object.values((await worker.evaluate(()=>chrome.storage.session.get('runtimeState'))).runtimeState.states)[0].count,1);
+  check('Credential editing while OCR is running resumes automatically and discards the old result');
+
+  for(const submit of ['click','enter']) {
+    await reset();await open();codeDelay=2000;await fill();
+    await page.waitForFunction(()=>document.querySelector('#hust-pass-status').textContent.includes('本地识别'));
+    if(submit==='click')await page.locator('#index_login_btn').click();
+    else await page.locator('#pd').press('Enter');
+    await page.waitForTimeout(2500);assert.equal(await page.evaluate(()=>window.clicks),1);
+    check(`Explicit manual ${submit} submission is never submitted again by the extension`);
+  }
 
   assert.equal(consoleErrors.filter(e => !e.includes('net::ERR_ABORTED') && !e.includes('503')).length, 0, consoleErrors.join('\n'));
   await writeFile('test-results/browser.json', JSON.stringify({ browser: context.browser()?.version(), results, consoleErrors, requests }, null, 2));

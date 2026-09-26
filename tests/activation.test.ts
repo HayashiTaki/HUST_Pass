@@ -9,7 +9,8 @@ function mock(options: { active?: boolean; point?: boolean; denied?: boolean; sl
     tabs:{
       query:async()=>[{id:options.active===false ? 2 : 1}],
       sendMessage:async(_tab:number,_message:unknown,selection:{documentId:string})=>{
-        assert.equal(selection.documentId,'document-1');points++;
+        assert.equal(selection.documentId,'document-1');
+        points++;
         return {valid:options.point!==false,url:'https://pass.hust.edu.cn/cas/login?service=x',x:options.move && points>2 ? 60 : 50,y:20,width:100,height:100};
       },
     },

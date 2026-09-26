@@ -8,6 +8,7 @@ async function main() {
   let epoch = 0, stableSince = 0, readyKey = '', ownBlob = '', ownCode = '';
   let errorRevision = 0, submittedRevision = 0;
   let activating = false, activationAttempted = false, activationGeneration = 0, activationToken = '';
+  let credentialRevision = 0;
   const credentials = () => credentialState(input('un'), input('pd'));
   let abort: AbortController | undefined;
   let submitTimer: ReturnType<typeof setTimeout> | undefined;
@@ -47,11 +48,19 @@ async function main() {
       && visible(button()) && !button()?.disabled && !input('pd')?.disabled && !input('un')?.disabled
       && !input('code')?.disabled && !input('code')?.readOnly;
   }
-  function ready() { return pageReady() && credentials() === 'ready'; }
+  function sampleCredentials() {
+    const state = credentials();
+    const key = state === 'missing' ? '' : state === 'preview' ? 'autofill-preview' : `${input('un')!.value.trim().length}:${input('pd')!.value.length}`;
+    if (key !== readyKey) { credentialRevision++; readyKey = key; stableSince = key ? Date.now() : 0; }
+    else if (key && !stableSince) stableSince = Date.now();
+    return state;
+  }
+  function credentialsStable() { return sampleCredentials() === 'ready' && stableSince > 0 && Date.now() - stableSince >= 800; }
+
   async function confirmAutofill() {
     if (activationAttempted) { stop('浏览器尚未提供自动填充值，请刷新页面后重试'); return; }
     activating = true; activationAttempted = true; activationGeneration = epoch; activationToken = '';
-    const generation = epoch;
+    const generation = epoch, revision = credentialRevision;
     status('正在确认浏览器自动填充…');
     try {
       await send({ type: 'autofill.activate' });
@@ -61,27 +70,43 @@ async function main() {
       }
       if (generation !== epoch || stopped) return;
       if (!pageReady()) { stop('登录页状态已改变，请刷新后重试'); return; }
-      if (credentials() !== 'ready') { stop('浏览器尚未提供自动填充值，请刷新页面后重试'); return; }
+      if (credentials() !== 'ready') {
+        if (credentialRevision !== revision) { status('等待账号密码填写完成并稳定后继续'); return; }
+        stop('浏览器尚未提供自动填充值，请刷新页面后重试'); return;
+      }
       status('账号密码已就绪，准备识别验证码…');
     } catch (error) {
       if (generation === epoch) stop(error instanceof Error ? error.message : '浏览器自动填充激活失败，请刷新页面');
     } finally { activating = false; stableSince = 0; readyKey = ''; }
   }
   function unchanged(generation: number, img: HTMLImageElement) {
-    return generation === epoch && ready() && image() === img && img.src === ownBlob && (!input('code')?.value || input('code')?.value === ownCode);
+    return generation === epoch && pageReady() && image() === img && img.src === ownBlob && (!input('code')?.value || input('code')?.value === ownCode);
   }
   async function run() {
     busy = true;
-    const generation = epoch, img = image()!;
+    const generation = epoch, img = image()!, revision = credentialRevision;
+    let token: string | undefined;
+    const deferIfEdited = async () => {
+      if (generation !== epoch || stopped || submitted) return true;
+      const stable = credentialsStable();
+      if (credentialRevision === revision && stable) return false;
+      const result = await send({ type: 'attempt.defer', token });
+      if (generation === epoch && !stopped && !submitted) {
+        if (result.ok) status('等待账号密码稳定后继续');
+        else stop('验证码任务已失效，请重新尝试');
+      }
+      return true;
+    };
     try {
       const start = await send({ type: 'attempt.begin' });
       if (!start.allowed) {
         if (!start.busy) stopped = true;
         status(start.message); return;
       }
-      if (generation !== epoch || !ready()) { stop('页面状态已改变，请重新尝试'); return; }
+      token = start.token;
+      if (generation !== epoch || !pageReady()) { stop('页面状态已改变，请重新尝试'); return; }
+      if (await deferIfEdited()) return;
       status('正在本地识别验证码…');
-      const token = start.token;
       abort = new AbortController();
       const timer = setTimeout(() => abort?.abort(), 10_000);
       let bytes: Uint8Array;
@@ -90,13 +115,14 @@ async function main() {
         if (!response.ok) throw new Error('验证码加载失败，请手动刷新');
         bytes = new Uint8Array(await response.arrayBuffer());
       } finally { clearTimeout(timer); }
-      if (generation !== epoch || !ready()) return;
+      if (generation !== epoch || !pageReady()) return;
       if (!['GIF87a','GIF89a'].includes(new TextDecoder().decode(bytes.slice(0,6))) || bytes.length > 1_000_000) throw new Error('验证码格式已改变，请手动填写');
       const previous = ownBlob;
       ownBlob = URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type: 'image/gif' }));
       // Set the exact bytes being recognized, without making a second code endpoint request.
       img.src = ownBlob;
       if (previous) URL.revokeObjectURL(previous);
+      if (await deferIfEdited()) return;
       const base64 = btoa(Array.from(bytes, c => String.fromCharCode(c)).join(''));
       let timeout: ReturnType<typeof setTimeout>;
       const result = await Promise.race([
@@ -104,6 +130,7 @@ async function main() {
         new Promise<never>((_, reject) => { timeout = setTimeout(() => reject(new Error('识别超时，请重新尝试')), 30_000); }),
       ]).finally(() => clearTimeout(timeout!));
       if (!unchanged(generation, img) || result.token !== token) return;
+      if (await deferIfEdited()) return;
       const check = await send({ type: 'attempt.check', token });
       if (!check.valid || !unchanged(generation, img)) { stop('验证码任务已失效，请重新尝试'); return; }
       if (!result.code || !/^\d{4}$/.test(result.code)) {
@@ -112,9 +139,11 @@ async function main() {
         else { status('识别不确定，正在准备重试…'); stableSince = Date.now(); }
         return;
       }
+      if (await deferIfEdited()) return;
       if (errorKind(errorText()) === 'other') { stop('网站提示登录异常，请检查页面提示'); return; }
       const permission = await send({ type: 'attempt.submit', token });
       if (!permission.valid || !unchanged(generation, img)) { stop('页面状态已改变，请重新尝试'); return; }
+      if (await deferIfEdited()) return;
       ownCode = result.code;
       input('code')!.value = ownCode;
       input('code')!.dispatchEvent(new Event('input', { bubbles: true }));
@@ -131,7 +160,7 @@ async function main() {
   chrome.runtime.onMessage.addListener((message, _sender, respond) => {
     if (message.type === 'page.activationPoint') {
       const field = input('code');
-      if (!activating || activationGeneration !== epoch || !pageReady() || !field || field.value || credentials() === 'missing'
+      if (!activating || activationGeneration !== epoch || !pageReady() || !field || field.value
         || (activationToken && activationToken !== message.token)) { respond({ valid: false }); return false; }
       activationToken = message.token;
       const rect = field.getBoundingClientRect(), x = rect.left + rect.width / 2, y = rect.top + rect.height / 2;
@@ -160,25 +189,20 @@ async function main() {
     stableSince = 0;
   });
   window.addEventListener('pagehide', () => { stop('已离开登录页', true); if (ownBlob) URL.revokeObjectURL(ownBlob); });
-  document.addEventListener('beforeinput', e => {
-    if (activating && e.isTrusted && ['un','pd','code'].includes((e.target as HTMLElement)?.id)) stop('你正在编辑登录信息，已停止自动填充激活');
-  }, true);
   document.addEventListener('input', e => {
     if (!e.isTrusted) return;
     const id = (e.target as HTMLElement)?.id;
     if (id === 'code') { ownCode = ''; stop('已切换为手动填写'); }
-    if (id === 'un' || id === 'pd') { if (busy) stop('账号信息正在修改，请重新尝试'); stableSince = 0; }
+    if (id === 'un' || id === 'pd') { credentialRevision++; stableSince = 0; }
   }, true);
   document.addEventListener('click', e => {
     if (!e.isTrusted) return;
     const target = e.target as Element;
-    if (activating && !target.closest('#code')) { stop('你正在操作登录页，已停止自动填充激活'); return; }
     if (target.closest('#index_login_btn')) stop('已由你手动提交登录');
     else if (target.closest('#codeImage,.code-box')) stop('验证码已手动刷新，请手动填写或重新尝试');
     else if (target.closest('.switch-login')) stop('登录方式已切换，请重新尝试');
   }, true);
   document.addEventListener('keydown', e => {
-    if (activating && e.isTrusted && !['Shift','Control','Alt','Meta'].includes(e.key)) { stop('你正在操作登录页，已停止自动填充激活'); return; }
     if (e.isTrusted && e.key === 'Enter' && ['un','pd','code'].includes((e.target as HTMLElement)?.id)) stop('已由你手动提交登录');
   }, true);
   if (document.readyState === 'loading') await new Promise<void>(resolve => document.addEventListener('DOMContentLoaded', () => resolve(), { once: true }));
@@ -212,13 +236,11 @@ async function main() {
       return;
     }
     if (activating) { if (!pageReady()) stop('登录页状态已改变，请刷新后重试'); return; }
-    if (busy) { if (!ready()) stop('登录页面状态已改变，请重新尝试'); return; }
-    if (!pageReady() || credentials() === 'missing') { stableSince = 0; return; }
+    const state = sampleCredentials();
+    if (busy) { if (!pageReady()) stop('登录页面状态已改变，请重新尝试'); return; }
+    if (!pageReady() || state === 'missing') { stableSince = 0; return; }
     if (input('code')!.value && input('code')!.value !== ownCode) { stop('已有手动验证码，请手动登录'); return; }
     if (!image()!.complete || !image()!.naturalWidth) return;
-    const state = credentials();
-    const key = state === 'preview' ? 'autofill-preview' : `${input('un')!.value.trim().length}:${input('pd')!.value.length}`;
-    if (!stableSince || key !== readyKey) { stableSince = Date.now(); readyKey = key; return; }
     if (Date.now() - stableSince >= 800) {
       if (state === 'preview') void confirmAutofill();
       else void run();
