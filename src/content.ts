@@ -55,7 +55,7 @@ async function main() {
     else if (key && !stableSince) stableSince = Date.now();
     return state;
   }
-  function credentialsStable() { return sampleCredentials() === 'ready' && stableSince > 0 && Date.now() - stableSince >= 800; }
+  function credentialsStable() { return sampleCredentials() === 'ready' && stableSince > 0 && Date.now() - stableSince >= 310; }
 
   async function confirmAutofill() {
     if (activationAttempted) { stop('浏览器尚未提供自动填充值，请刷新页面后重试'); return; }
@@ -241,9 +241,9 @@ async function main() {
     if (!pageReady() || state === 'missing') { stableSince = 0; return; }
     if (input('code')!.value && input('code')!.value !== ownCode) { stop('已有手动验证码，请手动登录'); return; }
     if (!image()!.complete || !image()!.naturalWidth) return;
-    if (Date.now() - stableSince >= 800) {
+    if (Date.now() - stableSince >= 310) {
       if (state === 'preview') void confirmAutofill();
       else void run();
     }
-  }, 250);
+  }, 100);
 }
